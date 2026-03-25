@@ -1,0 +1,14 @@
+{
+  "name": "voiceagent-saas",
+  "version": "1.0.0",
+  "description": "VoiceAgent SaaS — Multi-tenant AI Sales Voice Agent Platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n \"API,WEB\" -c \"green,cyan\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "migrate": "cd backend && npm run migrate"
+  },
+  "devDependencies": { "concurrently": "^8.2.2" }
+}
