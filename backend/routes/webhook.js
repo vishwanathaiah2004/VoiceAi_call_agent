@@ -10,6 +10,8 @@ const { bookMeeting }       = require('../services/calendarService');
 const logger = require('../config/logger');
 
 router.post('/', async (req, res) => {
+   console.log("🔥 WEBHOOK HIT");
+  console.log("🔥 BODY:", JSON.stringify(req.body, null, 2));
   // Verify webhook secret
   if (process.env.VAPI_WEBHOOK_SECRET &&
       req.headers['x-vapi-secret'] !== process.env.VAPI_WEBHOOK_SECRET) {
@@ -19,7 +21,8 @@ router.post('/', async (req, res) => {
   res.json({ received: true }); // Always respond immediately
 
   const event = req.body;
-  const type  = event.message?.type || event.type;
+  // const type  = event.message?.type || event.type;
+  const type =event.message?.type || event.type || event.event ||'';
 
   try {
     // ── call-started ────────────────────────────────────────────
@@ -35,7 +38,9 @@ router.post('/', async (req, res) => {
     if (type === 'end-of-call-report' || type === 'call-ended') {
       const call       = event.message?.call || event.call || {};
       const callId     = call.id;
-      const transcript = event.message?.transcript || event.transcript || '';
+      // const transcript = event.message?.transcript || event.transcript || '';
+      // const transcript =event.message?.analysis?.transcript ||event.message?.transcript?.text ||event.transcript ||'';
+      const transcript = event.message?.transcript || event.transcript ||event.message?.analysis?.transcript ||'';
       const recUrl     = call.recordingUrl || null;
       const duration   = call.endedAt && call.startedAt
         ? Math.round((new Date(call.endedAt) - new Date(call.startedAt)) / 1000) : null;
@@ -43,16 +48,23 @@ router.post('/', async (req, res) => {
       if (!callId) return;
 
       // Find lead + agent (scoped lookup - no tenant_id needed since callId is unique)
-      const { rows } = await pool.query(
-        `SELECT l.*, a.* as agent_data,
-                a.id as agent_id, a.name as agent_name,
-                a.google_refresh_token, a.google_client_id, a.google_client_secret,
-                a.sales_email, a.company_name as agent_company,
-                a.google_calendar_enabled
-         FROM leads l
-         JOIN agents a ON a.id = l.agent_id
-         WHERE l.vapi_call_id=$1`, [callId]
-      );
+     const { rows } = await pool.query(
+  `SELECT 
+      l.id as lead_id,
+      l.*,
+      a.id as agent_id,
+      a.name as agent_name,
+      a.google_refresh_token,
+      a.google_client_id,
+      a.google_client_secret,
+      a.sales_email,
+      a.company_name as agent_company,
+      a.google_calendar_enabled
+   FROM leads l
+   JOIN agents a ON a.id = l.agent_id
+   WHERE l.vapi_call_id=$1`,
+  [callId]
+);
 
       if (!rows[0]) { logger.warn('No lead for callId', { callId }); return; }
 
@@ -67,42 +79,89 @@ router.post('/', async (req, res) => {
         google_calendar_enabled: lead.google_calendar_enabled,
       };
 
-      if (transcript) {
-        const a = await analyzeTranscript(transcript);
+    const safeTranscript = transcript || 'No conversation captured';
 
-        await pool.query(`UPDATE leads SET
-          transcript=$1, recording_url=$2, call_duration_seconds=$3, call_status='completed',
-          name=COALESCE($4, name), email=COALESCE($5, email),
-          business_type=COALESCE($6, business_type),
-          interest_level=$7, meeting_booked=$8, meeting_time=$9, call_summary=$10
-          WHERE id=$11`,
-          [transcript, recUrl, duration, a.name, a.email, a.business_type,
-           a.interest_level, a.meeting_booked, a.meeting_time_requested,
-           a.summary, lead.id]
-        );
+let a = {
+  name: null,
+  email: null,
+  business_type: null,
+  interest_level: 'none',
+  meeting_booked: false,
+  meeting_time_requested: null,
+  summary: null
+};
 
-        // Auto-book calendar if enabled for this agent and lead agreed
-        if (agent.google_calendar_enabled && a.meeting_booked && a.email && a.name && a.meeting_time_requested) {
-          try {
-            const evt = await bookMeeting({
-              agent,
-              leadName:    a.name,
-              leadEmail:   a.email,
-              meetingTime: a.meeting_time_requested,
-              businessType:a.business_type,
-              leadId:      lead.id,
-            });
-            await pool.query(
-              'UPDATE leads SET calendar_event_id=$1, calendar_event_link=$2 WHERE id=$3',
-              [evt.eventId, evt.eventLink, lead.id]
-            );
-            logger.info('Meeting auto-booked', { leadId: lead.id, tenantId: lead.tenant_id });
-          } catch (err) { logger.error('Auto-book failed', { error: err.message }); }
-        }
+if (transcript) {
+  try {
+    a = await analyzeTranscript(transcript);
+    console.log("🧠 AI OUTPUT:", a);
+  } catch (err) {
+    console.error("AI ERROR:", err.message);
+  }
+}
+console.log("📞 TRANSCRIPT:", transcript);
+// ✅ ALWAYS update
+const result = await pool.query(`
+  UPDATE leads SET
+    transcript = $1,
+    recording_url = $2,
+    call_duration_seconds = $3,
+    call_status = 'completed',
+    name = COALESCE($4::text, name),
+    email = COALESCE($5::text, email),
+    business_type = COALESCE($6::text, business_type),
+    interest_level = COALESCE($7::text, interest_level),
+    meeting_booked = COALESCE($8::boolean, meeting_booked),
+    meeting_time = COALESCE($9::timestamp, meeting_time),
+    call_summary = $10::text
+  WHERE id = $11
+`, [
+  safeTranscript,
+  recUrl,
+  duration,
+  a.name || null,
+  a.email || null,
+  a.business_type || null,
+  a.interest_level || 'none',
+  a.meeting_booked ?? false,
+  a.meeting_time_requested || null,
+  a.summary || null,
+  lead.lead_id   
+]);
+console.log("✅ ROWS UPDATED:", result.rowCount);
+
+// ✅ KEEP calendar booking
+if (
+  agent.google_calendar_enabled &&
+  a.meeting_booked &&
+  a.email &&
+  a.name &&
+  a.meeting_time_requested
+) {
+  try {
+    const evt = await bookMeeting({
+      agent,
+      leadName: a.name,
+      leadEmail: a.email,
+      meetingTime: a.meeting_time_requested,
+      businessType: a.business_type,
+      leadId: lead.id,
+    });
+
+    await pool.query(
+      'UPDATE leads SET calendar_event_id=$1, calendar_event_link=$2 WHERE id=$3',
+      [evt.eventId, evt.eventLink, lead.lead_id ]
+    );
+
+    logger.info('Meeting auto-booked', { leadId: lead.id });
+  } catch (err) {
+    logger.error('Auto-book failed', { error: err.message });
+  }
+
       } else {
         await pool.query(
           "UPDATE leads SET call_status='completed', recording_url=$1, call_duration_seconds=$2 WHERE id=$3",
-          [recUrl, duration, lead.id]
+          [recUrl, duration, lead.lead_id ]
         );
       }
 
