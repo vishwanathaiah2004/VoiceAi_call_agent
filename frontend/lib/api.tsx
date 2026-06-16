@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://voiceai-call-agent.onrender.com'
 
 export async function api<T>(path: string, opts: RequestInit = {}): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('va_token') : null
