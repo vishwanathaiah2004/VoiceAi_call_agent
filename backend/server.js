@@ -10,8 +10,24 @@ const PORT = process.env.PORT || 4000;
 
 // ── Security ──────────────────────────────────────────────────────────────────
 app.use(helmet({ crossOriginEmbedderPolicy: false, contentSecurityPolicy: false }));
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:3000',
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    // allow any vercel.app preview/production URL
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    // allow any onrender.com URL
+    if (origin.endsWith('.onrender.com')) return callback(null, true);
+    // allow explicitly listed origins
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
   methods: ['GET','POST','PUT','DELETE','PATCH'],
 }));
