@@ -3,7 +3,7 @@ import { useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { AuthProvider, useAuth } from '@/lib/api'
-import { Mic2, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { BrainCircuit, Eye, EyeOff, Loader2 } from 'lucide-react'
 
 function LoginForm() {
   const { login } = useAuth()
@@ -25,21 +25,21 @@ function LoginForm() {
   return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', padding:'20px', background:'var(--bg)' }}>
       <div style={{ position:'fixed', inset:0, pointerEvents:'none', overflow:'hidden' }}>
-        <div style={{ position:'absolute', top:'-15%', left:'-5%', width:'500px', height:'500px', borderRadius:'50%', background:'radial-gradient(circle, rgba(48,209,88,.07) 0%, transparent 70%)', filter:'blur(40px)' }} />
-        <div style={{ position:'absolute', bottom:'-15%', right:'-5%', width:'400px', height:'400px', borderRadius:'50%', background:'radial-gradient(circle, rgba(48,209,88,.04) 0%, transparent 70%)', filter:'blur(40px)' }} />
+        <div style={{ position:'absolute', top:'-15%', left:'-5%', width:'600px', height:'600px', borderRadius:'50%', background:'radial-gradient(circle, rgba(124,58,237,.1) 0%, transparent 70%)', filter:'blur(60px)' }} />
+        <div style={{ position:'absolute', bottom:'-15%', right:'-5%', width:'500px', height:'500px', borderRadius:'50%', background:'radial-gradient(circle, rgba(59,130,246,.06) 0%, transparent 70%)', filter:'blur(60px)' }} />
       </div>
 
       <div className="animate-slide-up" style={{ width:'100%', maxWidth:'400px', position:'relative' }}>
         <div style={{ textAlign:'center', marginBottom:'36px' }}>
           <div style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:'50px', height:'50px', background:'var(--accent)', borderRadius:'14px', marginBottom:'14px' }}>
-            <Mic2 size={24} color="#070b09" />
+            <BrainCircuit size={24} color="#ffffff" />
           </div>
-          <h1 className="font-display" style={{ fontSize:'26px', fontWeight:700, color:'var(--txt)', letterSpacing:'-.02em' }}>VoiceAgent</h1>
-          <p style={{ color:'var(--txt-2)', fontSize:'13px', marginTop:'4px' }}>AI Sales Calling Platform</p>
+          <h1 className="font-display" style={{ fontSize:'26px', fontWeight:700, color:'var(--txt)', letterSpacing:'-.02em' }}>CallMind</h1>
+          <p style={{ color:'var(--txt-2)', fontSize:'13px', marginTop:'4px' }}>AI Voice Sales Platform</p>
         </div>
 
         <div className="card" style={{ padding:'28px' }}>
-          <h2 className="font-display" style={{ fontSize:'18px', fontWeight:600, marginBottom:'20px', color:'var(--txt)' }}>Sign in</h2>
+          <h2 className="font-display" style={{ fontSize:'18px', fontWeight:600, marginBottom:'20px', color:'var(--txt)' }}>Welcome back</h2>
 
           {error && <div style={{ background:'rgba(248,81,73,.1)', border:'1px solid rgba(248,81,73,.3)', borderRadius:'8px', padding:'10px 13px', marginBottom:'16px', fontSize:'13px', color:'var(--red)' }}>{error}</div>}
 

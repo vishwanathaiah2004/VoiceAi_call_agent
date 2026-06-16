@@ -3,7 +3,7 @@ import { useEffect, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { AuthProvider, useAuth } from '@/lib/api'
-import { LayoutDashboard, Users, BarChart2, LogOut, Mic2, Shield } from 'lucide-react'
+import { LayoutDashboard, Users, BarChart2, LogOut, Shield } from 'lucide-react'
 
 const NAV = [
   { label:'Platform Overview', href:'/superadmin',           icon:LayoutDashboard },
@@ -19,7 +19,7 @@ function SuperSidebar() {
       <div style={{ padding:'18px 16px', borderBottom:'1px solid var(--border)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'9px' }}>
           <div style={{ width:'32px', height:'32px', background:'var(--purple)', borderRadius:'9px', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <Shield size={16} color="#070b09" />
+            <Shield size={16} color="#ffffff" />
           </div>
           <div>
             <div className="font-display" style={{ fontSize:'14px', fontWeight:700, color:'var(--txt)' }}>Super Admin</div>

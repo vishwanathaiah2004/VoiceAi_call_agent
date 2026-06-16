@@ -1,12 +1,18 @@
 require('dotenv').config();
 const { Pool } = require('pg');
 
+const sslConfig = () => {
+  if (process.env.DATABASE_SSL === 'false') return false;
+  if (process.env.DATABASE_SSL === 'verify-full') return { rejectUnauthorized: true };
+  return { rejectUnauthorized: false };
+};
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_SSL === 'false' ? false : { rejectUnauthorized: false },
+  ssl: sslConfig(),
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  connectionTimeoutMillis: 15000, // Neon free tier needs up to 15s to wake from suspend
 });
 
 pool.on('error', (err) => console.error('DB pool error:', err.message));

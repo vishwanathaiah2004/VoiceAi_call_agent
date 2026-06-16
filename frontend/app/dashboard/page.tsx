@@ -29,10 +29,10 @@ export default function DashboardPage() {
   }, [])
 
   const cards = [
-    { label:'Total Calls',      value:stats?.totalLeads,      icon:Phone,       color:'var(--blue)',   bg:'rgba(77,171,247,.1)' },
-    { label:'Meetings Booked',  value:stats?.meetingsBooked,  icon:Calendar,    color:'var(--accent)', bg:'var(--accent-faint)' },
-    { label:'High Interest',    value:stats?.highInterest,    icon:TrendingUp,  color:'var(--amber)',  bg:'rgba(240,160,48,.1)' },
-    { label:'Conversion Rate',  value:stats ? `${stats.conversionRate}%` : null, icon:Activity, color:'var(--purple)', bg:'rgba(177,151,252,.1)' },
+    { label:'Total Calls',      value:stats?.totalLeads,      icon:Phone,       color:'var(--cyan)',    bg:'rgba(6,182,212,.1)' },
+    { label:'Meetings Booked',  value:stats?.meetingsBooked,  icon:Calendar,    color:'var(--accent-light)', bg:'var(--accent-faint)' },
+    { label:'High Interest',    value:stats?.highInterest,    icon:TrendingUp,  color:'var(--green)',   bg:'rgba(16,185,129,.1)' },
+    { label:'Conversion Rate',  value:stats ? `${stats.conversionRate}%` : null, icon:Activity, color:'var(--amber)', bg:'rgba(245,158,11,.1)' },
   ]
 
   return (
@@ -40,7 +40,7 @@ export default function DashboardPage() {
       <div style={{ marginBottom:'26px', display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
         <div>
           <h1 className="font-display" style={{ fontSize:'24px', fontWeight:700, color:'var(--txt)', letterSpacing:'-.02em' }}>
-            Overview
+            Dashboard
           </h1>
           <p style={{ color:'var(--txt-2)', fontSize:'13px', marginTop:'3px' }}>
             {new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' })}
@@ -51,14 +51,14 @@ export default function DashboardPage() {
 
       {/* Trial banner */}
       {tenant?.plan === 'trial' && (
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', background:'rgba(240,160,48,.08)', border:'1px solid rgba(240,160,48,.25)', borderRadius:'10px', padding:'12px 16px', marginBottom:'22px' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', background:'rgba(124,58,237,.08)', border:'1px solid rgba(124,58,237,.2)', borderRadius:'12px', padding:'12px 16px', marginBottom:'22px' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-            <Zap size={16} style={{ color:'var(--amber)' }}/>
-            <p style={{ fontSize:'13px', color:'var(--amber)' }}>
+            <Zap size={16} style={{ color:'var(--accent-light)' }}/>
+            <p style={{ fontSize:'13px', color:'var(--accent-light)' }}>
               You're on a free trial · {tenant.callsLimit - tenant.callsUsed} calls remaining
             </p>
           </div>
-          <Link href="/dashboard/settings" className="btn-secondary" style={{ fontSize:'12px', padding:'5px 12px', color:'var(--amber)', borderColor:'rgba(240,160,48,.3)' }}>
+          <Link href="/dashboard/settings" className="btn-secondary" style={{ fontSize:'12px', padding:'5px 12px', color:'var(--accent-light)', borderColor:'rgba(124,58,237,.3)' }}>
             Upgrade Plan
           </Link>
         </div>
@@ -91,7 +91,7 @@ export default function DashboardPage() {
           <div style={{ display:'flex', gap:'28px' }}>
             {[['Calls Today', stats?.callsToday], ['This Week', stats?.callsThisWeek]].map(([l, v]) => (
               <div key={l as string}>
-                <div className="font-display" style={{ fontSize:'30px', fontWeight:700, color:'var(--accent)', letterSpacing:'-.02em' }}>
+                <div className="font-display" style={{ fontSize:'30px', fontWeight:700, color:'var(--accent-light)', letterSpacing:'-.02em' }}>
                   {loading ? <Sk w={36} h={30}/> : (v ?? 0)}
                 </div>
                 <div style={{ fontSize:'11px', color:'var(--txt-3)' }}>{l}</div>
@@ -100,8 +100,8 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="card" style={{ padding:'18px 22px', background:'linear-gradient(135deg,var(--bg-card),var(--bg-active))', borderColor:'var(--border-hi)' }}>
-          <p style={{ fontSize:'13px', color:'var(--txt-2)', marginBottom:'8px' }}>Ready to call more leads?</p>
-          <p style={{ fontSize:'12px', color:'var(--txt-3)', marginBottom:'14px', lineHeight:'1.6' }}>Upload a CSV and Emma calls everyone automatically.</p>
+          <p style={{ fontSize:'13px', color:'var(--txt-2)', marginBottom:'8px' }}>Scale your outreach instantly</p>
+          <p style={{ fontSize:'12px', color:'var(--txt-3)', marginBottom:'14px', lineHeight:'1.6' }}>Upload a CSV and your AI agent calls everyone automatically.</p>
           <div style={{ display:'flex', gap:'8px' }}>
             <Link href="/dashboard/call-lead" className="btn-primary" style={{ fontSize:'12px', padding:'6px 12px' }}><Phone size={12}/> Single Call</Link>
             <Link href="/dashboard/bulk-call" className="btn-secondary" style={{ fontSize:'12px', padding:'6px 12px' }}><Upload size={12}/> Bulk CSV</Link>

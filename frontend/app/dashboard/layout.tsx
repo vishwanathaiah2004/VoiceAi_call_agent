@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { AuthProvider, useAuth } from '@/lib/api'
-import { LayoutDashboard, Phone, Upload, Users, Calendar, BarChart2, Settings, LogOut, Mic2, ChevronRight, Zap } from 'lucide-react'
+import { LayoutDashboard, Phone, Upload, Users, Calendar, BarChart2, Settings, LogOut, BrainCircuit, ChevronRight, Zap } from 'lucide-react'
 
 const NAV = [
   { label:'Overview',     href:'/dashboard',              icon:LayoutDashboard },
@@ -27,11 +27,11 @@ function Sidebar() {
       <div style={{ padding:'18px 16px 14px', borderBottom:'1px solid var(--border)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'9px' }}>
           <div style={{ width:'32px', height:'32px', background:'var(--accent)', borderRadius:'9px', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-            <Mic2 size={16} color="#070b09"/>
+            <BrainCircuit size={16} color="#ffffff"/>
           </div>
           <div style={{ overflow:'hidden' }}>
             <div className="font-display" style={{ fontSize:'15px', fontWeight:700, color:'var(--txt)', lineHeight:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-              {tenant?.companyName || 'VoiceAgent'}
+              {tenant?.companyName || 'CallMind'}
             </div>
             <div style={{ fontSize:'10px', color:'var(--txt-3)', marginTop:'2px', textTransform:'capitalize' }}>{tenant?.plan} plan</div>
           </div>
@@ -42,10 +42,10 @@ function Sidebar() {
       <div style={{ padding:'9px 16px', borderBottom:'1px solid var(--border)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'7px' }}>
           <span style={{ position:'relative', display:'inline-flex', width:'7px', height:'7px' }}>
-            <span style={{ position:'absolute', inset:0, borderRadius:'50%', background:'var(--accent)', opacity:.6, animation:'pulse-ring 2s infinite' }}/>
+            <span style={{ position:'absolute', inset:0, borderRadius:'50%', background:'var(--accent)', opacity:.5, animation:'pulse-ring 2s infinite' }}/>
             <span style={{ position:'relative', borderRadius:'50%', background:'var(--accent)', width:'7px', height:'7px', display:'block' }}/>
           </span>
-          <span style={{ fontSize:'11px', color:'var(--txt-2)' }}>Agent active</span>
+          <span style={{ fontSize:'11px', color:'var(--txt-2)' }}>Agent online</span>
         </div>
       </div>
 
@@ -74,10 +74,10 @@ function Sidebar() {
             <span style={{ fontSize:'10px', color:'var(--txt-2)', fontFamily:'var(--font-mono)' }}>{tenant.callsUsed}/{tenant.callsLimit}</span>
           </div>
           <div style={{ height:'4px', background:'var(--border-hi)', borderRadius:'2px', overflow:'hidden' }}>
-            <div style={{ height:'100%', width:`${Math.min(usagePercent,100)}%`, background: usagePercent>90?'var(--red)':usagePercent>70?'var(--amber)':'var(--accent)', borderRadius:'2px', transition:'width .3s' }}/>
+            <div style={{ height:'100%', width:`${Math.min(usagePercent,100)}%`, background: usagePercent>90?'var(--red)':usagePercent>70?'var(--amber)':'var(--accent-light)', borderRadius:'2px', transition:'width .3s' }}/>
           </div>
           {usagePercent > 80 && (
-            <Link href="/dashboard/settings" style={{ display:'block', marginTop:'6px', fontSize:'10px', color:'var(--amber)', textDecoration:'none' }}>
+            <Link href="/dashboard/settings" style={{ display:'block', marginTop:'6px', fontSize:'10px', color:'var(--accent-light)', textDecoration:'none' }}>
               ⚡ Upgrade plan →
             </Link>
           )}
@@ -87,7 +87,7 @@ function Sidebar() {
       {/* User */}
       <div style={{ padding:'10px 12px' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'7px' }}>
-          <div style={{ width:'28px', height:'28px', borderRadius:'50%', background:'var(--accent-glow)', border:'1px solid var(--border-hi)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:700, color:'var(--accent)', flexShrink:0 }}>
+          <div style={{ width:'28px', height:'28px', borderRadius:'50%', background:'var(--accent-faint)', border:'1px solid rgba(124,58,237,.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:700, color:'var(--accent-light)', flexShrink:0 }}>
             {user?.name?.[0]?.toUpperCase()}
           </div>
           <div style={{ overflow:'hidden' }}>

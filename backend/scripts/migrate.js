@@ -127,6 +127,24 @@ CREATE TRIGGER trg_agents_updated  BEFORE UPDATE ON agents  FOR EACH ROW EXECUTE
 
 async function migrate() {
   console.log('🔄 Running migration...');
+
+  // Retry loop — Neon free tier suspends and needs time to wake up
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      await pool.query('SELECT 1'); // wake-up ping
+      break;
+    } catch (err) {
+      retries--;
+      if (retries === 0) {
+        console.error('❌ Could not connect to database after 3 attempts:', err.message);
+        process.exit(1);
+      }
+      console.log(`⏳ DB waking up, retrying in 5s... (${retries} attempts left)`);
+      await new Promise(r => setTimeout(r, 5000));
+    }
+  }
+
   try {
     await pool.query(SQL);
     console.log('✅ All tables created');

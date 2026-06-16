@@ -41,6 +41,8 @@ export interface Agent {
   offer_text: string; calendar_pitch: string; fallback_message: string
   vapi_phone_number_id: string | null; sales_email: string | null
   google_calendar_enabled: boolean; is_active: boolean
+  google_client_id: string | null; google_client_secret: string | null
+  google_refresh_token: string | null
   created_at: string
 }
 export interface Lead {

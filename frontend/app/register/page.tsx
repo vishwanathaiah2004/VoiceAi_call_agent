@@ -2,7 +2,7 @@
 import { useState, FormEvent } from 'react'
 import Link from 'next/link'
 import { AuthProvider, useAuth } from '@/lib/api'
-import { Mic2, Loader2, CheckCircle2 } from 'lucide-react'
+import { BrainCircuit, Loader2, CheckCircle2 } from 'lucide-react'
 
 const INDUSTRIES = ['SaaS','E-commerce','Real Estate','Healthcare','Finance','Education','Retail','Consulting','Agency','Other']
 
@@ -19,7 +19,7 @@ function RegisterForm() {
     catch (err: any) { setError(err.message); setLoading(false) }
   }
 
-  const perks = ['14-day free trial — no credit card needed','Your own AI agent with custom name & script','Automatic lead qualification & meeting booking','Full dashboard with analytics']
+  const perks = ['14-day free trial — no credit card needed','Custom AI agent with your brand & script','Automatic lead qualification & meeting booking','Real-time analytics dashboard']
 
   return (
     <div style={{ minHeight:'100vh', display:'grid', gridTemplateColumns:'1fr 1fr', background:'var(--bg)' }}>
@@ -27,15 +27,15 @@ function RegisterForm() {
       <div style={{ padding:'48px', display:'flex', flexDirection:'column', justifyContent:'center', background:'linear-gradient(135deg, var(--bg-card), var(--bg-active))', borderRight:'1px solid var(--border)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'10px', marginBottom:'48px' }}>
           <div style={{ width:'40px', height:'40px', background:'var(--accent)', borderRadius:'11px', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <Mic2 size={20} color="#070b09"/>
+            <BrainCircuit size={20} color="#ffffff"/>
           </div>
-          <span className="font-display" style={{ fontSize:'20px', fontWeight:700, color:'var(--txt)' }}>VoiceAgent</span>
+          <span className="font-display" style={{ fontSize:'20px', fontWeight:700, color:'var(--txt)' }}>CallMind</span>
         </div>
         <h2 className="font-display" style={{ fontSize:'32px', fontWeight:700, color:'var(--txt)', lineHeight:1.2, marginBottom:'16px', letterSpacing:'-.02em' }}>
-          Your AI sales team,<br/>fully automated.
+          Smarter outreach,<br/>on autopilot.
         </h2>
         <p style={{ color:'var(--txt-2)', fontSize:'15px', marginBottom:'36px', lineHeight:1.7 }}>
-          Create your AI calling agent in minutes. It qualifies leads, handles objections, and books meetings — while you sleep.
+          Deploy an AI voice agent in minutes. It calls your leads, qualifies them, handles objections, and books meetings — around the clock.
         </p>
         <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
           {perks.map(p => (
@@ -80,7 +80,7 @@ function RegisterForm() {
 
             <button type="submit" disabled={loading||!form.companyName||!form.name||!form.email||!form.password}
               className="btn-primary" style={{ width:'100%', justifyContent:'center', padding:'12px', fontSize:'14px', marginTop:'4px' }}>
-              {loading ? <><Loader2 size={15} className="animate-spin"/>Creating account…</> : 'Create Free Account →'}
+              {loading ? <><Loader2 size={15} className="animate-spin"/>Creating account…</> : 'Get Started Free →'}
             </button>
 
             <p style={{ fontSize:'11px', color:'var(--txt-3)', textAlign:'center' }}>
