@@ -269,5 +269,5 @@ npm run dev
 
 ## Built By
 
-**H M Vishwanathaiah** — Internship Project  
+**H M Vishwanathaiah** 
 [GitHub](https://github.com/vishwanathaiah2004)
