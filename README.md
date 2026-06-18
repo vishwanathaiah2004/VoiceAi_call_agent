@@ -13,7 +13,7 @@
 
 [![CallMind Demo Video](docs/screenshots/thumbnail.png)](docs/demo.mp4)
 
-> **Note:** If the video doesn't play inline, [click here to download and watch](docs/demo.mp4)
+> If the video doesn't play inline, [click here to download and watch](docs/demo.mp4)
 
 ---
 
@@ -21,10 +21,10 @@
 
 ### Login & Register
 ![Login Page](docs/screenshots/login.png)
-![Register Page](docs/screenshots/register.png)
+![Register Page](docs/screenshots/Register.png)
 
 ### Dashboard Overview
-![Dashboard](docs/screenshots/dashboard.png)
+![Dashboard](docs/screenshots/Dashboard.png)
 
 ### Agent Setup
 ![Agent Setup](docs/screenshots/agent-setup.png)
@@ -36,12 +36,11 @@
 ### Leads & Transcripts
 ![Leads Table](docs/screenshots/leads.png)
 
-
-
 ### Analytics
-![Analytics](docs/screenshots/analytics.png)
+![Analytics](docs/screenshots/Analytics.png)
 
-
+### Settings
+![Settings](docs/screenshots/settings.png)
 
 ---
 
@@ -190,9 +189,8 @@ callmind/
 │       └── pages.tsx          # Dashboard page components
 │
 ├── docs/
-│   ├── architecture.png       # Architecture diagram
-│   ├── demo.mp4               # Demo video
-│   └── screenshots/           # UI screenshots
+│   ├── screenshots/           # UI screenshots
+│   └── architecture.png       # Architecture diagram
 │
 └── README.md
 ```
@@ -267,11 +265,9 @@ npm run dev
 | Pro | 2,000 | $149/mo | ~$100 | ~$49 |
 | Enterprise | 10,000 | $499/mo | ~$500 | ~$0* |
 
-*Enterprise margins improve with Vapi volume discounts.
-
 ---
 
 ## Built By
 
-**H M Vishwanathaiah**  
-[GitHub](https://github.com/vishwanathaiah2004) · [LinkedIn](https://linkedin.com/in/yourprofile)
+**H M Vishwanathaiah** — Internship Project  
+[GitHub](https://github.com/vishwanathaiah2004)
