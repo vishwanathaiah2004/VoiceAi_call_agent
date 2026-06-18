@@ -1,34 +1,207 @@
-# 🤖 VoiceAgent SaaS Platform
+# CallMind — AI Voice Sales Platform
 
-**Multi-tenant AI Sales Calling Platform** — Any business can sign up, create their own AI voice agent, and start calling leads automatically.
+**Multi-tenant SaaS platform** where any business signs up, deploys their own AI voice agent, and automatically calls leads, qualifies them, and books meetings — 24/7, no human needed.
 
----
-
-## How It Works
-
-```
-You (Platform Owner)
-└── VoiceAgent Platform
-    ├── Client 1: TechCorp
-    │   └── Agent "Alex" — sells SaaS software
-    │   └── Their own leads, calls, meetings
-    │
-    ├── Client 2: Real Estate Co.
-    │   └── Agent "Sarah" — books property tours  
-    │   └── Completely isolated from other clients
-    │
-    └── Client 3: Dental Clinic
-        └── Agent "Mike" — books appointments
-        └── Their own data, analytics, team
-```
-
-Each client signs up, customizes their agent (name, voice, script, questions), connects their Vapi phone number, and starts calling.
+🔗 **Live Demo:** [voice-ai-call-agent.vercel.app](https://voice-ai-call-agent.vercel.app)  
+🔗 **Backend API:** [voiceai-call-agent.onrender.com/health](https://voiceai-call-agent.onrender.com/health)
 
 ---
 
-## Quick Start
+## Demo Video
 
-### 1. Install
+> Click the thumbnail below to watch the full demo
+
+[![CallMind Demo Video](docs/screenshots/thumbnail.png)](docs/demo.mp4)
+
+> **Note:** If the video doesn't play inline, [click here to download and watch](docs/demo.mp4)
+
+---
+
+## Screenshots
+
+### Login & Register
+![Login Page](docs/screenshots/login.png)
+![Register Page](docs/screenshots/register.png)
+
+### Dashboard Overview
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Agent Setup
+![Agent Setup](docs/screenshots/agent-setup.png)
+
+### Call Lead & Bulk Call
+![Call Lead](docs/screenshots/call-lead.png)
+![Bulk Call](docs/screenshots/bulk-call.png)
+
+### Leads & Transcripts
+![Leads Table](docs/screenshots/leads.png)
+
+
+
+### Analytics
+![Analytics](docs/screenshots/analytics.png)
+
+
+
+---
+
+## System Architecture
+
+![Architecture Diagram](docs/screenshots/architecture.png)
+
+### How It Works
+
+```
+Browser (Next.js — Vercel)
+         │
+         │  HTTPS REST API
+         ▼
+Express Backend (Node.js — Render)
+         │                    │
+         │                    │ Vapi API (initiate call)
+         ▼                    ▼
+  Neon PostgreSQL         Vapi Platform
+  (Database)           (AI dials the number)
+         ▲                    │
+         │                    │ POST /api/webhook
+         │◄───────────────────┘  (call ended + transcript)
+         │
+         │  Gemini AI
+         │  (analyze transcript → extract name, email, interest)
+         │
+         ▼
+   Google Calendar
+   (auto-book meeting if interested)
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS |
+| Backend | Node.js, Express.js |
+| Database | PostgreSQL (Neon serverless) |
+| Auth | JWT (jsonwebtoken), bcryptjs |
+| AI Voice | Vapi.ai (Gemini 2.0 Flash model, Deepgram transcription) |
+| AI Analysis | Google Gemini API |
+| Calendar | Google Calendar API (OAuth2) |
+| Hosting | Vercel (frontend) + Render (backend) |
+| Security | Helmet.js, CORS, express-rate-limit |
+
+---
+
+## Key Features
+
+- **Multi-tenant** — every business gets fully isolated data, agents, and analytics
+- **Custom AI agent** — each client sets their own agent name, voice, script, qualifying questions
+- **Auto-qualify leads** — AI extracts interest level, name, email from conversation
+- **Auto-book meetings** — books Google Calendar events when lead says yes
+- **Bulk calling** — upload CSV, AI calls everyone automatically
+- **Real-time analytics** — conversion rates, call volume, interest breakdown
+- **Plan management** — trial / starter / pro / enterprise with call limits
+- **Super admin panel** — platform owner sees all tenants, usage, growth
+
+---
+
+## Multi-Tenant Architecture
+
+```
+CallMind Platform
+├── Tenant: TechCorp
+│   ├── Agent "Alex" — sells SaaS
+│   ├── Their leads (isolated)
+│   └── Their analytics
+│
+├── Tenant: Real Estate Co.
+│   ├── Agent "Sarah" — books property tours
+│   └── Completely separate data
+│
+└── Tenant: Dental Clinic
+    ├── Agent "Mike" — books appointments
+    └── Their own team & billing
+```
+
+Every DB query is scoped with `WHERE tenant_id = $1` — tenants can never see each other's data.
+
+---
+
+## Database Schema
+
+```
+tenants     — one row per business
+  id (UUID), company_name, slug, plan, calls_used, calls_limit, trial_ends_at
+
+users       — linked to a tenant (or superadmin with tenant_id = NULL)
+  id (UUID), tenant_id, name, email, password_hash, role
+
+agents      — AI agent config per tenant
+  id (UUID), tenant_id, name, voice_id, greeting, objective,
+  qualifying_questions, offer_text, calendar_pitch, vapi_phone_number_id
+
+leads       — every call record, scoped to tenant
+  id (UUID), tenant_id, agent_id, phone, name, email,
+  interest_level, meeting_booked, transcript, call_summary, vapi_call_id
+```
+
+---
+
+## Project Structure
+
+```
+callmind/
+├── backend/
+│   ├── server.js              # Express + security middleware
+│   ├── db.js                  # PostgreSQL connection pool
+│   ├── middleware/
+│   │   ├── auth.js            # JWT verification + role checks
+│   │   └── rateLimiter.js     # Per-endpoint rate limiting
+│   ├── routes/
+│   │   ├── auth.js            # signup, login, /me
+│   │   ├── agents.js          # Agent CRUD
+│   │   ├── calls.js           # Single call + bulk CSV
+│   │   ├── leads.js           # Leads CRUD (tenant-scoped)
+│   │   ├── meetings.js        # Meeting list
+│   │   ├── analytics.js       # Charts data
+│   │   ├── billing.js         # Plans + usage
+│   │   ├── superadmin.js      # Platform admin routes
+│   │   └── webhook.js         # Vapi webhook handler
+│   └── services/
+│       ├── vapiService.js     # Dynamic prompt builder + call initiator
+│       ├── geminiService.js   # Transcript analysis
+│       └── calendarService.js # Google Calendar OAuth2
+│
+├── frontend/
+│   ├── app/
+│   │   ├── login/             # Login page
+│   │   ├── register/          # Signup (creates tenant + user)
+│   │   ├── dashboard/         # Tenant dashboard
+│   │   │   ├── agent-setup/   # Customize AI agent
+│   │   │   ├── call-lead/     # Trigger single call
+│   │   │   ├── bulk-call/     # CSV upload
+│   │   │   ├── leads/         # Lead table + transcripts
+│   │   │   ├── meetings/      # Booked meetings
+│   │   │   ├── analytics/     # Charts
+│   │   │   └── settings/      # Account + billing
+│   │   └── superadmin/        # Platform owner panel
+│   └── lib/
+│       ├── api.tsx            # Auth context + typed API client
+│       └── pages.tsx          # Dashboard page components
+│
+├── docs/
+│   ├── architecture.png       # Architecture diagram
+│   ├── demo.mp4               # Demo video
+│   └── screenshots/           # UI screenshots
+│
+└── README.md
+```
+
+---
+
+## Local Development
+
+### 1. Install dependencies
 ```bash
 npm run install:all
 ```
@@ -37,158 +210,68 @@ npm run install:all
 ```bash
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env.local
-# Fill in backend/.env with all API keys
+# Fill in backend/.env with your API keys
 ```
 
-### 3. Migrate database
+### 3. Run database migration
 ```bash
 npm run migrate
-# Creates all tables and prints your super admin login
+# Creates all tables + prints your superadmin login
 ```
 
-### 4. Get Google Calendar token (optional but recommended)
-```bash
-cd backend
-node scripts/get-google-token.js
-```
-
-### 5. Start ngrok (so Vapi can reach you)
+### 4. Start ngrok (Vapi needs a public URL)
 ```bash
 ngrok http 4000
-# Copy the https URL → set as BACKEND_URL in backend/.env
-# Also set in Vapi Dashboard → Settings → Server URL → /api/webhook
+# Copy HTTPS URL → set as BACKEND_URL in backend/.env
+# Set same URL in Vapi Dashboard → Settings → Server URL
 ```
 
-### 6. Run
+### 5. Start both servers
 ```bash
 npm run dev
 ```
 
-- **Platform**: http://localhost:3000
-- **Backend**: http://localhost:4000
-
----
-
-## User Flows
-
-### New Client Signs Up
-1. Goes to `/register`
-2. Fills in company name, email, password
-3. Gets 14-day trial (50 calls free)
-4. Redirected to Agent Setup → customizes name, voice, script
-5. Connects their Vapi phone number
-6. Goes to Call Lead → enters number → Emma calls
-
-### You (Super Admin)
-1. Login at `/login` with `SUPERADMIN_EMAIL`
-2. Redirected to `/superadmin`
-3. See all tenants, usage, growth charts
-4. Manage plans, suspend accounts, view details
-
----
-
-## Project Structure
-
-```
-voiceagent-saas/
-├── backend/
-│   ├── server.js              # Express + security middleware
-│   ├── db.js                  # PostgreSQL pool
-│   ├── config/logger.js       # Winston logging
-│   ├── middleware/
-│   │   ├── auth.js            # JWT + role checks (auth/superAdmin/tenantAdmin)
-│   │   └── rateLimiter.js     # Per-endpoint rate limits
-│   ├── routes/
-│   │   ├── auth.js            # signup (creates tenant+user), login, me
-│   │   ├── agents.js          # CRUD for AI agent config per tenant
-│   │   ├── calls.js           # Single call + bulk CSV upload
-│   │   ├── leads.js           # Leads CRUD (tenant-scoped)
-│   │   ├── meetings.js        # Meeting booking + list
-│   │   ├── analytics.js       # Charts data (tenant-scoped)
-│   │   ├── billing.js         # Plans, usage, upgrade
-│   │   ├── tenants.js         # Tenant profile + team management
-│   │   ├── superadmin.js      # Platform-wide admin (you only)
-│   │   └── webhook.js         # Vapi webhook handler
-│   └── services/
-│       ├── vapiService.js     # Builds dynamic prompt from agent config
-│       ├── geminiService.js   # Transcript analysis
-│       └── calendarService.js # Per-tenant Google Calendar
-│
-├── frontend/
-│   ├── app/
-│   │   ├── login/             # Login page
-│   │   ├── register/          # Signup page (creates tenant)
-│   │   ├── dashboard/         # Per-tenant dashboard
-│   │   │   ├── page.tsx       # Overview with stats
-│   │   │   ├── agent-setup/   # ⭐ The core SaaS page — customize your agent
-│   │   │   ├── call-lead/     # Trigger a call (shows all agents)
-│   │   │   ├── bulk-call/     # CSV upload
-│   │   │   ├── leads/         # Lead table + transcript viewer
-│   │   │   ├── meetings/      # Booked meetings
-│   │   │   ├── analytics/     # Charts
-│   │   │   └── settings/      # Account + team + billing
-│   │   └── superadmin/        # Platform owner panel
-│   │       ├── page.tsx       # Platform stats
-│   │       ├── tenants/       # Manage all tenants
-│   │       └── analytics/     # Growth charts
-│   └── lib/
-│       ├── api.ts             # Auth context + typed API client
-│       └── pages.tsx          # All dashboard page components
-│
-├── railway.toml               # One-click Railway deploy
-├── vercel.json                # One-click Vercel deploy
-└── README.md
-```
-
----
-
-## Database Schema
-
-```
-tenants        — one row per business that signs up
-  id, company_name, slug, plan, calls_used, calls_limit, trial_ends_at
-
-users          — platform users (linked to tenant, or superadmin)
-  id, tenant_id, name, email, password_hash, role (owner/admin/agent/viewer/superadmin)
-
-agents         — AI agent config per tenant (name, voice, script, phone, calendar)
-  id, tenant_id, name, company_name, voice_id, greeting, qualifying_questions,
-  offer_text, calendar_pitch, vapi_phone_number_id, google_credentials...
-
-leads          — all call records (scoped to tenant + agent)
-  id, tenant_id, agent_id, phone, name, email, interest_level,
-  meeting_booked, transcript, call_summary, vapi_call_id...
-```
+- **Frontend:** http://localhost:3000  
+- **Backend:** http://localhost:4000
 
 ---
 
 ## Deployment
 
-### Backend → Railway
-1. Push to GitHub
-2. railway.app → New Project → Deploy from GitHub
-3. Add all env vars from `backend/.env.example`
-4. Railway gives you a URL → set as `BACKEND_URL`
-5. Update Vapi webhook to `https://your-url.railway.app/api/webhook`
+### Backend → Render
+1. Push repo to GitHub
+2. Render → New Web Service → connect repo
+3. Root Directory: `backend` | Build: `npm install` | Start: `node server.js`
+4. Add all env vars from `backend/.env.example`
+5. Run migration: Render Shell → `node scripts/migrate.js`
 
 ### Frontend → Vercel
-1. vercel.com → New Project → Import repo
-2. Root directory: `frontend`
-3. Set `NEXT_PUBLIC_API_URL=https://your-railway-url.railway.app`
+1. Vercel → New Project → import repo
+2. **Root Directory: `frontend`**
+3. Add env var: `NEXT_PUBLIC_API_URL=https://your-render-url.onrender.com`
 4. Deploy
 
-### After deploy:
-- Set `FRONTEND_URL` in Railway to your Vercel URL
+### After both are live
+- Set `FRONTEND_URL` in Render to your Vercel URL (fixes CORS)
+- Set `BACKEND_URL` in Render to your Render URL (fixes Vapi webhook)
+- Set Vapi webhook: `https://your-render-url.onrender.com/api/webhook`
 
 ---
 
-## Pricing Model (Suggested)
+## Pricing Model
 
-| Plan       | Calls/month | Your Price | Your Cost (Vapi) |
-|------------|-------------|------------|------------------|
-| Trial      | 50          | Free       | ~$5              |
-| Starter    | 500         | $49/mo     | ~$25             |
-| Pro        | 2,000       | $149/mo    | ~$100            |
-| Enterprise | 10,000      | $499/mo    | ~$500            |
+| Plan | Calls/month | Price | Vapi Cost | Margin |
+|---|---|---|---|---|
+| Trial | 50 | Free | ~$5 | — |
+| Starter | 500 | $49/mo | ~$25 | ~$24 |
+| Pro | 2,000 | $149/mo | ~$100 | ~$49 |
+| Enterprise | 10,000 | $499/mo | ~$500 | ~$0* |
 
-Margins are healthy at Pro and Enterprise tiers.
+*Enterprise margins improve with Vapi volume discounts.
+
+---
+
+## Built By
+
+**H M Vishwanathaiah**  
+[GitHub](https://github.com/vishwanathaiah2004) · [LinkedIn](https://linkedin.com/in/yourprofile)
