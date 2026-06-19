@@ -17,7 +17,7 @@
 
 ---
 
-## Screenshots
+## Screenshots..
 
 ### Login & Register
 ![Login Page](docs/screenshots/login.png)
