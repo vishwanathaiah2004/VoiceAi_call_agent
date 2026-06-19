@@ -1,4 +1,4 @@
-# CallMind — AI Voice Sales Platform
+# CallMind — AI Voice Sales Platform.
 
 **Multi-tenant SaaS platform** where any business signs up, deploys their own AI voice agent, and automatically calls leads, qualifies them, and books meetings — 24/7, no human needed.
 
